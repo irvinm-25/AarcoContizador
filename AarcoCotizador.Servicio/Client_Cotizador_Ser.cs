@@ -139,7 +139,7 @@ namespace AarcoCotizador.Servicio
         }
         public async Task<Domicilio_Mod> Obtener_Domicilio(Catalogo_Request_Mod oParametros)
         {
-            var cadenaIn = "AarcoCotizador.Servicio.Client_Cotizador_Ser.Obtener_Marcas() " + oParametros.ToString();
+            var cadenaIn = "AarcoCotizador.Servicio.Client_Cotizador_Ser.Obtener_Domicilio() " + oParametros.ToString();
             var oResult = new Domicilio_Mod();
             try
             {
