@@ -1,0 +1,188 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Index";
+    var ListaMarcas = (AarcoCotizador.Modelo.Catalogo_Marca_Mod)ViewBag.ListaMarcas;
+}
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4 class="panel-title" style="font-weight:bold">
+            Vehículo
+        </h4>
+    </div>
+    <div class="panel-body">        
+            <div class="form-group">
+                <label for="ddlMarca">Marca:</label>
+                <select class="form-control" id="ddlMarca">
+                    <option value="0">Selecciona una Marca</option>
+                    @foreach (var item in ListaMarcas.Lista_Marcas)
+                    {
+                        <option value="@item.iIdMarca">@item.sMarca</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="ddlSubmarca">Submarca:</label>
+                <select class="form-control" id="ddlSubmarca">
+                    <option value="0">Selecciona una Submarca</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="ddlModelo">Modelo:</label>
+                <select class="form-control" id="ddlModelo">
+                    <option value="0">Selecciona un Modelo</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="ddlDescripcion">Descripción:</label>
+                <select class="form-control" id="ddlDescripcion">
+                    <option value="0">Selecciona una Descripción</option>
+                </select>
+            </div>                    
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4 class="panel-title" style="font-weight:bold">
+            Domicilio
+        </h4>
+    </div>
+    <div class="panel-body">        
+            <div class="form-group">
+                <label for="txtCodigo">Código Postal:</label>
+                <input type="text" id="txtCodigo" class="form-control" maxlength="5" />
+            </div>
+            <div class="form-group">
+                <label for="txtEstado">Estado:</label>
+                <input type="text" id="txtEstado" class="form-control" readonly />
+            </div>
+            <div class="form-group">
+                <label for="txtMunicipio">Municipio:</label>
+                <input type="text" id="txtMunicipio" class="form-control" readonly />
+            </div>
+            <div class="form-group">
+                <label for="txtColonia">Colonia:</label>
+                <input type="text" id="txtColonia" class="form-control" readonly />
+            </div>
+            <button id="btnCotizar" type="button" class="btn btn-primary">Cotizar</button>        
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+
+        var Url_ObtenerSubmarcas = '@Url.Action("ObtenerSubmarcas", "Home")';
+        var Url_ObtenerModelos = '@Url.Action("ObtenerModelos", "Home")';
+        var Url_ObtenerDescripciones = '@Url.Action("ObtenerDescripciones", "Home")';
+        var Url_ObtenerDomicilio = '@Url.Action("ObtenerDomicilio", "Home")';
+
+        var optionModelo = "<option value='0'>Seleccione un Modelo</option>";
+        var optionDescripcion = "<option value='0'>Seleccione una Descripción</option>";
+
+        $("#ddlMarca").change(function () {
+            var idMarca = $("#ddlMarca").val();
+            var parametros = { Filtro: idMarca };
+
+            requestAjax(Url_ObtenerSubmarcas, "POST", parametros, function (response) {
+                console.log(response);
+                var html = "<option value='0'>Seleccione una Submarca</option>"
+                if (response.Lista_Submarca != null) {
+                    for (var i = 0; i < response.Lista_Submarca.length; i++) {
+                        html += "<option value='" + response.Lista_Submarca[i].iIdSubMarca + "'>" + response.Lista_Submarca[i].sSubMarca + "</option>";
+                    }
+
+                    $("#ddlSubmarca").empty().html(html);
+                    $("#ddlModelo").empty().html(optionModelo);
+                    $("#ddlDescripcion").empty().html(optionDescripcion);
+                } else {
+                    $("#ddlSubmarca").empty().html(html);
+                    $("#ddlModelo").empty().html(optionModelo);
+                    $("#ddlDescripcion").empty().html(optionDescripcion);
+                }
+            }, function (e) {
+                console.log(e);
+            });
+        });
+
+        $("#ddlSubmarca").change(function () {
+            var idSubmarca = $("#ddlSubmarca").val();
+            var parametros = { Filtro: idSubmarca };
+
+            requestAjax(Url_ObtenerModelos, "POST", parametros, function (response) {
+                console.log(response);
+                var html = optionModelo;
+                if (response.Lista_Modelo != null) {
+                    for (var i = 0; i < response.Lista_Modelo.length; i++) {
+
+                        html += "<option value='" + response.Lista_Modelo[i].iIdModelo + "'>" + response.Lista_Modelo[i].sModelo + "</option>";
+                    }
+
+                    $("#ddlModelo").empty().html(html);
+                    $("#ddlDescripcion").empty().html(optionDescripcion);
+                } else {
+                    $("#ddlModelo").empty().html(html);
+                    $("#ddlDescripcion").empty().html(optionDescripcion);
+                }
+            }, function (e) {
+                console.log(e);
+            });
+        });
+
+        $("#ddlModelo").change(function () {
+            var idModelo = $("#ddlModelo").val();
+            var parametros = { Filtro: idModelo };
+
+            requestAjax(Url_ObtenerDescripciones, "POST", parametros, function (response) {
+                console.log(response);
+                var html = optionDescripcion;
+                if (response.Lista_DescripcionModelo != null) {
+                    for (var i = 0; i < response.Lista_DescripcionModelo.length; i++) {
+                        html += "<option value='" + response.Lista_DescripcionModelo[i].iIdDescripcionModelo + "'>" + response.Lista_DescripcionModelo[i].sDescripcion + "</option>";
+                    }
+                    $("#ddlDescripcion").empty().html(html);
+                } else {
+                    $("#ddlDescripcion").empty().html(html);
+                }
+            }, function (e) {
+                console.log(e);
+            });
+        });
+
+        $('#txtCodigo').keypress(function (event) {
+            var keycode = (event.keyCode ? event.keyCode : event.which);
+            if (keycode == '13') {
+
+                if ($("#txtCodigo").val().length == 5) {
+                    var parametros = { Filtro: $("#txtCodigo").val() };
+
+                    requestAjax(Url_ObtenerDomicilio, "POST", parametros, function (response) {
+                        console.log(response);
+                        $("#txtEstado").val(response.Estado);
+                        $("#txtMunicipio").val(response.Municipio);
+                        $("#txtColonia").val(response.Colonia);
+                    }, function (e) {
+                        console.log(e);
+                    });
+                } else {
+                    alert("El Código Postal es de 5 caracteres");
+                }
+            }
+        });
+
+        $("#txtCodigo").keypress(function (e) {           
+            if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {                                
+                return false;
+            }
+        });
+
+        $("#btnCotizar").click(function () {
+            
+            if ($("#ddlDescripcion").val() == 0 || $("#txtColonia").val() == "") {
+                alert("Falta ingresar datos");
+            } else {
+                alert("Datos completados");
+            }
+        });
+    });
+</script>
